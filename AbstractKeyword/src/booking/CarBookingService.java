@@ -5,6 +5,8 @@ import car.CarService;
 import user.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CarBookingService {
@@ -17,8 +19,8 @@ public class CarBookingService {
     }
 
     public UUID bookCar(User user, String regNumber){
-     Car[] availableCars = carService.getAllCarsService();
-     if (availableCars.length <= 0){
+     List<Car> availableCars = carService.getAllCarsService();
+     if (availableCars.size() <= 0){
          throw new IllegalStateException("No Car available now");
      }
 
@@ -33,87 +35,45 @@ public class CarBookingService {
      throw new IllegalStateException("The car with the RegNumber: " + regNumber + " is already booked");
  }
 
- public Car[] getUserBookedCars(UUID userId){
-     CarBooking [] carbookingUsers = carBookingDao.getBookinCars();
-     if (carbookingUsers.length<= 0){
-         return null;
-     }
+ public List<Car> getUserBookedCars(UUID userId){
+     List<CarBooking> carbookingUsers = carBookingDao.getBookinCars();
+     List<Car> carBookedByUserId = new ArrayList<>();
 
-     int contatoreCar = 0;
      for (CarBooking car : carbookingUsers){
-         if (car.getUsers().getUserId().equals(userId)){
-             contatoreCar++;
+         if (car != null && car.getUsers().getUserId().equals(userId)){
+             carBookedByUserId.add(car.getCars());
          }
      }
-
-     Car[] carBookedByUserId = new Car[contatoreCar];
-     int bookingUserCounter = 0;
-     for (CarBooking car : carbookingUsers){
-         if (car.getUsers().getUserId().equals(userId)){
-             carBookedByUserId[bookingUserCounter++] = car.getCars();
-         }
-     }
-     if (bookingUserCounter > 0){
-         return carBookedByUserId;
-     }
-     return new Car[bookingUserCounter];
+     return carBookedByUserId;
  }
 
- public Car[] getAvailablesCar(){
+ public List<Car> getAvailablesCar(){
      return getAllCarsUnbooked();
  }
 
- public CarBooking[] getBookings(){
-     CarBooking[] carBookings = carBookingDao.getBookinCars();
-     int countBookedCars = 0;
+ public List<CarBooking> getBookings(){
+     List<CarBooking> carBookings = carBookingDao.getBookinCars();
+     List<CarBooking> bookedCars = new ArrayList<>();
 
-     if(carBookings.length == 0) {
-     }
-
-     for (CarBooking carBooking: carBookings){
-         if (!carBooking.getCars().equals(null)){
-             countBookedCars++;
-         }
-     }
-     if (countBookedCars == 0){
-         return new CarBooking[countBookedCars];
-     }
-
-     int controlBookedCars = 0;
-     CarBooking[] bookings = new CarBooking[countBookedCars];
      for (CarBooking car : carBookings){
-         if (!car.getCars().equals(null)) {
-             bookings[controlBookedCars++] = car;
+         if (!car.getCars().equals(null)){
+             bookedCars.add(car);
          }
      }
-     return bookings;
-
+     return bookedCars;
  }
 
- private Car[] getAllCarsUnbooked(){
-     Car[] allCars = carService.getAllCarsService();
-     CarBooking[] bookingDaos = carBookingDao.getBookinCars();
-     int numberOfUnbookedCar = 0;
+ private List<Car> getAllCarsUnbooked(){
+     List<Car> allCars = carService.getAllCarsService();
+     List<CarBooking> bookingDaos = carBookingDao.getBookinCars();
+     List<Car> carAvaila = new ArrayList<>();
 
      for (CarBooking c : bookingDaos){
          if (c.getBookingId().equals(null)){
-             numberOfUnbookedCar++;
+             carAvaila.add(c.getCars());
          }
      }
-     Car[] carAvaila = new Car[numberOfUnbookedCar];
-     int control = 0;
-
-     for (CarBooking c : bookingDaos){
-         if (c.getBookingId().equals(null)){
-             carAvaila[control++] = c.getCars();
-         }
-     }
-
-     if (numberOfUnbookedCar > 0) {
-         return carAvaila;
-     } else {
-         return new Car[numberOfUnbookedCar];
-     }
+     return carAvaila;
 
  }
 }

@@ -1,5 +1,8 @@
 package car;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CarService {
     private CarDataAccess carDao;
 
@@ -10,7 +13,7 @@ public class CarService {
         this.carDao = carDao;
     };
 
-    public Car[] getAllCarsService(){
+    public List<Car> getAllCarsService(){
         return carDao.getCars();
     }
 
@@ -24,26 +27,13 @@ public class CarService {
 
     }
 
-    public Car [] getElectricalCars(){
+    public List<Car> getElectricalCars(){
 
-        int contatore = 0;
+        List<Car> electricalCars = new ArrayList<>();
 
-        for (Car car : carDao.getCars()){
-            if (car.isElectric() == true){
-                contatore++;
-            }
-        }
-        if (contatore <= 0){
-            throw new MatchException("there is no Electrical car available",new Throwable(""));
-        }
-
-        Car[] electricalCars = new Car[contatore];
-        int controlcontatore = 0;
-
-        for (int j = 0; j < carDao.getCars().length; j++) {
-            if (carDao.getCars()[j].isElectric() == true){
-                electricalCars[controlcontatore] = carDao.getCars()[j];
-                controlcontatore++;
+        for (int j = 0; j < getAllCarsService().size(); j++) {
+            if (getAllCarsService().get(j).isElectric()){
+                electricalCars.add(getAllCarsService().get(j));
             }
         }
         return electricalCars;

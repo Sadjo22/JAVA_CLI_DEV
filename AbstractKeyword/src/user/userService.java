@@ -2,6 +2,7 @@ package user;
 
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 public class userService {
@@ -11,7 +12,7 @@ public class userService {
         this.userDao = userDao;
     }
 
-    public User[] getUsers(){
+    public List<User> getUsers(){
         return userDao.getUsers();
     }
 
